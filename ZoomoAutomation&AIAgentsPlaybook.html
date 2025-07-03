@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Zoomo Automation & AI Agents Playbook</title>
+   <link rel="icon" type="image/x-icon" href="logo.png">
+   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+       rel="stylesheet">
+   <style>
+       :root {
+           --primary: #6A0DAD;
+           /* Primary purple */
+           --primary-light: #9B59B6;
+           /* Light purple */
+           --primary-dark: #4A148C;
+           /* Dark purple */
+           --accent: #FFD700;
+           /* Gold accent */
+           --dark: #2D3748;
+           --light: #F8FAFC;
+           --text: #4A5568;
+           --gradient: linear-gradient(135deg, var(--primary), var(--primary-light));
+       }
+
+
+       * {
+           box-sizing: border-box;
+           margin: 0;
+           padding: 0;
+       }
+
+
+       body {
+           font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+           background-color: var(--light);
+           color: var(--text);
+           margin: 0;
+           padding: 0;
+           overflow: hidden;
+           line-height: 1.6;
+       }
+
+
+       .slide {
+           width: 100vw;
+           height: 100vh;
+           overflow-y: auto;
+           position: absolute;
+           top: 0;
+           left: 0;
+           opacity: 0;
+           visibility: hidden;
+           transition: opacity 0.5s ease;
+           padding: 0;
+           display: none;
+       }
+
+
+       .slide.active {
+           opacity: 1;
+           visibility: visible;
+           z-index: 10;
+           display: block;
+       }
+
+
+       .title-slide-content {
+           /* Renamed from .title-slide to avoid conflict with .slide */
+           background: var(--gradient);
+           color: white;
+           text-align: center;
+           display: flex;
+           flex-direction: column;
+           justify-content: center;
+           align-items: center;
+           height: 100vh;
+           /* Ensure it takes full viewport height */
+       }
+
+
+       .title-slide-content h1 {
+           /* Updated selector */
+           font-size: 3.5rem;
+           margin-bottom: 1rem;
+           font-weight: 700;
+       }
+
+
+       .title-slide-content h2 {
+           /* Updated selector */
+           font-size: 2rem;
+           font-weight: 500;
+           margin-bottom: 2rem;
+           opacity: 0.9;
+       }
+
+
+       .slide-header {
+           position: absolute;
+           top: 0;
+           left: 0;
+           right: 0;
+           background-color: var(--primary);
+           color: white;
+           display: flex;
+           justify-content: space-between;
+           align-items: center;
+           padding: 0.5rem 2rem;
+           height: 3.5rem;
+           z-index: 100;
+       }
+
+
+       .logo {
+           height: 2.5rem;
+           width: auto;
+       }
+
+
+       .slide-content {
+           max-width: 1200px;
+           margin: 4.5rem auto 0;
+           padding: 2rem;
+           height: calc(100vh - 4.5rem - 4px);
+           /* Adjusted for progress bar */
+           overflow-y: auto;
+       }
+
+
+       pre {
+           background-color: #282a36;
+           border-radius: 0.5rem;
+           overflow-x: auto;
+           padding: 1rem;
+           color: #f8f8f2;
+           font-size: 0.875rem;
+           line-height: 1.5;
+           margin: 1rem 0;
+       }
+
+
+       code {
+           /* Base code style */
+           font-family: 'Fira Code', monospace;
+       }
+
+
+       /* For syntax highlighting (if library added later) */
+       code[class*="language-"] {
+           /* Basic styling for code blocks, specific colors would come from highlighter */
+           padding: 0.2em 0.4em;
+           margin: 0;
+           font-size: 85%;
+           border-radius: 3px;
+       }
+
+
+       pre code[class*="language-"] {
+           font-size: 0.875rem;
+           /* Ensure pre code is consistent */
+       }
+
+
+
+
+       .controls {
+           position: fixed;
+           bottom: 1rem;
+           right: 1rem;
+           z-index: 100;
+           display: flex;
+           gap: 0.5rem;
+       }
+
+
+       button {
+           background-color: var(--primary);
+           color: white;
+           border: none;
+           border-radius: 0.25rem;
+           padding: 0.5rem 1rem;
+           cursor: pointer;
+           transition: all 0.2s ease;
+           font-family: 'Poppins', sans-serif;
+           font-weight: 500;
+       }
+
+
+       button:hover {
+           background-color: var(--primary-light);
+           transform: translateY(-2px);
+       }
+
+
+       .progress-bar-container {
+           position: fixed;
+           top: 3.5rem;
+           /* Below the header */
+           left: 0;
+           right: 0;
+           height: 4px;
+           background-color: rgba(0, 0, 0, 0.1);
+           z-index: 99;
+           /* Below header, above content */
+       }
+
+
+       .progress-bar {
+           height: 100%;
+           background-color: var(--accent);
+           width: 0;
+           transition: width 0.3s ease;
+       }
+
+
+       table {
+           width: 100%;
+           border-collapse: collapse;
+           margin: 1rem 0;
+           box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+           border-radius: 0.5rem;
+           overflow: hidden;
+       }
+
+
+       th,
+       td {
+           border: 1px solid #e2e8f0;
+           padding: 0.75rem;
+           text-align: left;
+       }
+
+
+       th {
+           background-color: var(--primary);
+           color: white;
+           font-weight: 600;
+       }
+
+
+       tr:nth-child(even) {
+           background-color: #f1f5f9;
+       }
+
+
+       .slide-counter {
+           position: fixed;
+           bottom: 1rem;
+           left: 1rem;
+           z-index: 100;
+           font-size: 0.875rem;
+           color: var(--text);
+           background-color: rgba(255, 255, 255, 0.8);
+           padding: 0.25rem 0.5rem;
+           border-radius: 0.25rem;
+           font-weight: 500;
+       }
+
+
+       h2 {
+           color: var(--primary);
+           font-size: 2.2rem;
+           margin-bottom: 1.5rem;
+           font-weight: 600;
+           border-bottom: 2px solid var(--primary-light);
+           padding-bottom: 0.5rem;
+       }
+
+
+       h3 {
+           color: var(--primary-dark);
+           font-size: 1.5rem;
+           margin: 1.5rem 0 1rem;
+           font-weight: 500;
+       }
+
+
+       ul,
+       ol {
+           margin-left: 1.5rem;
+           margin-bottom: 1.5rem;
+       }
+
+
+       li {
+           margin-bottom: 0.5rem;
+       }
+
+
+       .icon-grid {
+           display: grid;
+           grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+           gap: 2rem;
+           margin: 2rem 0;
+       }
+
+
+       .icon-card {
+           background-color: white;
+           border-radius: 0.5rem;
+           padding: 1.5rem;
+           box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+           display: flex;
+           flex-direction: column;
+           align-items: center;
+           text-align: center;
+           transition: transform 0.3s ease, box-shadow 0.3s ease;
+       }
+
+
+       .icon-card:hover {
+           transform: translateY(-5px);
+           box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+       }
+
+
+       .icon-card i {
+           font-size: 2.5rem;
+           color: var(--primary);
+           margin-bottom: 1rem;
+       }
+
+
+       .icon-card h4 {
+           font-size: 1.2rem;
+           margin-bottom: 0.5rem;
+           color: var(--primary-dark);
+       }
+
+
+       .icon-card p {
+           font-size: 0.9rem;
+           color: var(--text);
+       }
+
+
+       .two-columns {
+           display: grid;
+           grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+           gap: 2rem;
+           margin: 1.5rem 0;
+       }
+
+
+       .screenshot {
+           border-radius: 0.5rem;
+           box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+           max-width: 100%;
+           height: auto;
+           margin: 1rem 0;
+       }
+
+
+       .n8n-logo {
+           display: inline-block;
+           padding: 0.5rem 1rem;
+           background-color: #FF6C2C;
+           color: white;
+           border-radius: 4px;
+           font-weight: bold;
+           margin-right: 1rem;
+       }
+
+
+       .highlight-box {
+           background-color: rgba(106, 13, 173, 0.05);
+           /* Lighter purple */
+           border-left: 4px solid var(--primary);
+           padding: 1rem 1.5rem;
+           margin: 1.5rem 0;
+           border-radius: 0 0.5rem 0.5rem 0;
+       }
+
+
+       .highlight-box p {
+           margin-bottom: 0.5em;
+       }
+
+
+       .highlight-box p:last-child {
+           margin-bottom: 0;
+       }
+
+
+
+
+       .activity-container {
+           display: grid;
+           grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+           gap: 2rem;
+           margin-top: 2rem;
+       }
+
+
+       .activity-card {
+           background-color: white;
+           border-radius: 0.5rem;
+           padding: 1.5rem;
+           box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+           transition: transform 0.3s ease, box-shadow 0.3s ease;
+       }
+
+
+       .activity-card:hover {
+           transform: translateY(-5px);
+           box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+       }
+
+
+       .activity-card h3 {
+           /* Adjusted for consistency */
+           color: var(--primary);
+           font-size: 1.5rem;
+           /* Consistent with other h3 */
+           margin-top: 0;
+           /* Remove top margin if it's the first element */
+           margin-bottom: 1rem;
+           display: flex;
+           align-items: center;
+       }
+
+
+       .activity-card h3 i {
+           margin-right: 0.5rem;
+           font-size: 1.5rem;
+           /* Match h3 font size */
+       }
+
+
+       .activity-steps {
+           background-color: #f7f7f7;
+           border-radius: 0.5rem;
+           padding: 1rem;
+           margin-top: 1rem;
+       }
+
+
+       .activity-steps ol {
+           padding-left: 1.5rem;
+           /* Indent the numbers */
+       }
+
+
+       .activity-steps li {
+           margin-bottom: 0.75rem;
+           padding-left: 0.5rem;
+           /* Space between number and text */
+           position: relative;
+       }
+
+
+
+
+       .example-box {
+           background-color: #e8f4f8;
+           border-left: 4px solid #3498db;
+           padding: 1rem 1.5rem;
+           margin-top: 1rem;
+           border-radius: 0 0.5rem 0.5rem 0;
+       }
+
+
+       .example-box p {
+           margin-bottom: 0.5em;
+       }
+
+
+       .example-box p:last-child {
+           margin-bottom: 0;
+       }
+
+
+
+
+       .practice-form {
+           background-color: white;
+           border: 2px dashed var(--primary-light);
+           border-radius: 0.5rem;
+           padding: 1.5rem;
+           margin-top: 1rem;
+       }
+
+
+       .input-group {
+           margin-bottom: 1rem;
+       }
+
+
+       .input-group label {
+           display: block;
+           margin-bottom: 0.25rem;
+           font-weight: 500;
+           color: var(--primary-dark);
+       }
+
+
+       input,
+       select,
+       textarea {
+           width: 100%;
+           padding: 0.5rem;
+           border: 1px solid #e2e8f0;
+           border-radius: 0.25rem;
+           font-family: 'Poppins', sans-serif;
+           margin-top: 0.5rem;
+       }
+
+
+       textarea {
+           min-height: 80px;
+       }
+
+
+       .quote {
+           font-style: italic;
+           padding: 1rem 1.5rem;
+           background-color: rgba(255, 215, 0, 0.1);
+           border-left: 4px solid var(--accent);
+           margin: 1.5rem 0;
+           border-radius: 0 0.5rem 0.5rem 0;
+       }
+
+
+       .quote p {
+           margin-bottom: 0.5em;
+       }
+
+
+       .quote p:last-child {
+           margin-bottom: 0;
+       }
+
+
+       .step-box {
+           /* This was for a different step visual, can be reused or adapted if needed */
+           background-color: white;
+           border-radius: 0.5rem;
+           padding: 1.5rem;
+           margin-bottom: 1rem;
+           box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+           position: relative;
+           padding-left: 3rem;
+           /* space for number */
+       }
+
+
+       .step-box .step-number-custom {
+           /* if using step-box */
+           position: absolute;
+           left: 1rem;
+           /* Adjust as needed */
+           top: 1.5rem;
+           background-color: var(--primary);
+           color: white;
+           width: 30px;
+           height: 30px;
+           border-radius: 50%;
+           display: flex;
+           align-items: center;
+           justify-content: center;
+           font-weight: bold;
+           font-size: 1.1rem;
+       }
+
+
+
+
+       a {
+           color: var(--primary);
+           /* Consistent link color */
+           text-decoration: underline;
+       }
+
+
+       a:hover {
+           color: var(--primary-dark);
+       }
+
+
+       .interactive-prompt-box {
+           background-color: #e6f7ff;
+           /* Light blue */
+           border-left: 4px solid #1890ff;
+           /* Blue accent */
+           padding: 1rem 1.5rem;
+           margin: 1.5rem 0;
+           border-radius: 0 0.5rem 0.5rem 0;
+       }
+
+
+       .interactive-prompt-box h4 {
+           color: #0050b3;
+           /* Darker blue */
+           margin-bottom: 0.75rem;
+           font-size: 1.2rem;
+           /* Adjusted for consistency */
+           display: flex;
+           align-items: center;
+           font-weight: 600;
+           /* Make prompt titles a bit bolder */
+       }
+
+
+       .interactive-prompt-box h4 i {
+           margin-right: 0.75rem;
+           color: #1890ff;
+           /* Blue icon */
+           font-size: 1.3rem;
+           /* Adjusted for consistency */
+       }
+
+
+       .interactive-prompt-box p {
+           margin-bottom: 0.5em;
+           font-size: 1rem;
+       }
+
+
+       .interactive-prompt-box p:last-child {
+           margin-bottom: 0;
+       }
+
+
+       .interactive-prompt-box ul {
+           margin-top: 0.5rem;
+       }
+
+
+       .diagram-placeholder {
+           /* Kept for cases where image placeholder is still used */
+           border: 2px dashed var(--primary-light);
+           padding: 1.5rem;
+           text-align: center;
+           margin: 1.5rem 0;
+           border-radius: 0.5rem;
+           background-color: #fafafa;
+       }
+
+
+       .diagram-placeholder p {
+           color: var(--text);
+           font-style: italic;
+       }
+
+
+       .demo-placeholder {
+           background-color: #f0f0f0;
+           border: 1px solid #ccc;
+           padding: 1rem;
+           text-align: center;
+           margin: 1.5rem 0;
+           border-radius: 0.5rem;
+           font-style: italic;
+           color: var(--text);
+       }
+
+
+       .demo-placeholder p {
+           margin-bottom: 0.5rem;
+       }
+
+
+       .demo-placeholder p:last-child {
+           margin-bottom: 0;
+       }
+
+
+       /* New styles for improved diagram flow */
+       .flow-step {
+           background-color: #f4f0f7;
+           /* Light purple background */
+           border: 1px solid var(--primary-light);
+           padding: 0.75rem;
+           margin: 0.5rem auto;
+           border-radius: 0.3rem;
+           text-align: left;
+           width: fit-content;
+           /* Shrink to content */
+           min-width: 300px;
+           /* Ensure readability */
+           box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+           display: block;
+           /* Ensure it behaves as a block if used inline before */
+       }
+
+
+       .flow-arrow {
+           text-align: center;
+           font-size: 1.5rem;
+           color: var(--primary);
+           margin: 0.2rem 0;
+       }
+   </style>
+</head>
+
+<!-- NEW SLIDES CONTENT -->
+<body>
+   <!-- Progress bar (shows completion) -->
+   <div class="progress-bar-container">
+       <div class="progress-bar" id="progressBar"></div>
+   </div>
+   
+   <!-- Slide counter (shows current slide number) -->
+   <div class="slide-counter" id="slideCounter">Slide 1 of 6</div>
+
+<div class="controls">
+    <button class="prevBtn"><i class="fas fa-arrow-left"></i> Previous</button>
+    <button class="nextBtn">Next <i class="fas fa-arrow-right"></i></button>
+</div>
+
+<!-- Slide 2: Zoomo Playbook Title -->
+<div class="slide" id="slide-2">
+   <div class="slide-header">
+       <div>
+           <div style="background-color: white; width: 40px; height: 40px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;">
+               <img style="height: 20px;" src="logo.png" alt="LO Logo">
+           </div>
+           <span style="margin-left: 0.2rem; font-weight: 500;">Zoomo Automation & AI Agents Playbook</span>
+       </div>
+       <div>Introduction</div>
+   </div>
+   <div class="slide-content">
+       <div style="display: flex; align-items: center; margin-bottom: 3rem;">
+           <div style="background: linear-gradient(135deg, var(--primary), var(--primary-light)); width: 80px; height: 80px; border-radius: 20px; display: flex; align-items: center; justify-content: center; margin-right: 2rem;">
+               <i class="fas fa-cogs" style="font-size: 2rem; color: white;"></i>
+           </div>
+           <div>
+               <h2 style="margin-bottom: 0.5rem; font-size: 2.5rem;">Zoomo Automation & AI Agents Playbook</h2>
+               <p style="color: var(--text); font-size: 1.1rem; margin: 0;">Transform manual, repetitive tasks into intelligent automated workflows.</p>
+           </div>
+       </div>
+
+
+       <div class="highlight-box">
+           <p><strong>Goal:</strong> To empower every team to automate and elevate their own work, using a "right tool for the right job" strategy.</p>
+       </div>
+
+
+       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-top: 2rem;">
+           <div class="icon-card">
+               <i class="fas fa-map-marked-alt"></i>
+               <h4>Map Your Process</h4>
+               <p>Start with a detailed plan</p>
+           </div>
+          
+           <div class="icon-card">
+               <i class="fas fa-brain"></i>
+               <h4>Choose Your Automation "Brain"</h4>
+               <p>3 levels, from simple rules to AI agents</p>
+           </div>
+          
+           <div class="icon-card">
+               <i class="fas fa-tools"></i>
+               <h4>Select Right Tool</h4>
+               <p>From Google Gems to custom code</p>
+           </div>
+          
+           <div class="icon-card">
+               <i class="fas fa-rocket"></i>
+               <h4>Golden Rules</h4>
+               <p>Essential guidelines for success</p>
+           </div>
+
+           <div class="icon-card">
+               <i class="fas fa-question-circle"></i>
+               <h4>What to Do Next</h4>
+               <p>Essential guidelines for success</p>
+           </div>
+
+           <div class="icon-card">
+               <i class="fas fa-book"></i>
+               <h4>AI Glossary</h4>
+               <p>In plain English</p>
+           </div>
+       </div>
+
+
+       <div class="quote" style="margin-top: 2rem;">
+           <p>This guide is for every Zoomer. It helps you understand our existing tools for building automations and AI agents internally, so you can choose the right tool and start building initiatives that make you work smarter.</p>
+       </div>
+   </div>
+</div>
+
+
+<!-- Slide 3: Step 1 - Map Your Process -->
+<div class="slide" id="slide-3">
+   <div class="slide-header">
+       <div>
+           <div style="background-color: white; width: 40px; height: 40px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;">
+               <img style="height: 20px;" src="logo.png" alt="LO Logo">
+           </div>
+           <span style="margin-left: 0.2rem; font-weight: 500;">Zoomo Automation & AI Agents Playbook</span>
+       </div>
+       <div>Step 1: Map Your Process</div>
+   </div>
+   <div class="slide-content">
+       <div style="display: flex; align-items: center; margin-bottom: 3rem;">
+           <div style="background: linear-gradient(135deg, #FF6B6B, #FF8E53); width: 80px; height: 80px; border-radius: 20px; display: flex; align-items: center; justify-content: center; margin-right: 2rem;">
+               <i class="fas fa-map-marked-alt" style="font-size: 2rem; color: white;"></i>
+           </div>
+           <div>
+               <h2 style="margin-bottom: 0.5rem; font-size: 2.5rem; color: #FF6B6B;">1. Start Here: Map Your Process</h2>
+               <p style="color: var(--text); font-size: 1.1rem; margin: 0;">A good, detailed plan is 80% of the work</p>
+           </div>
+       </div>
+
+
+       <div class="highlight-box">
+           <p><strong>Before you touch any automation tool,</strong> follow this planning process. Map out the process step by step first!</p>
+       </div>
+
+
+       <h3>📝 Five Step Mapping Process</h3>
+      
+       <table style="margin-top: 1.5rem;">
+           <thead>
+               <tr>
+                   <th style="width: 15%;">Step</th>
+                   <th style="width: 35%;">Question</th>
+                   <th style="width: 50%;">Example</th>
+               </tr>
+           </thead>
+           <tbody>
+               <tr>
+                   <td><strong>1. 🎯 Define Goal</strong></td>
+                   <td>What is the <strong>single</strong>, clear <strong>outcome</strong> you want to achieve?</td>
+                   <td><em>"Notify the sales team in Slack about a new B2B lead from our website form."</em></td>
+               </tr>
+               <tr>
+                   <td><strong>2. ⚡ Define Trigger</strong></td>
+                   <td>What event <strong>starts</strong> the process?</td>
+                   <td><em>"Form submission on website"</em></td>
+               </tr>
+               <tr>
+                   <td><strong>3. 🗺️ Map Steps</strong></td>
+                   <td>Write down <strong>every single action</strong> you do now <em>(manually)</em> from start to finish</td>
+                   <td><em>1. Lead fills out form → 2. Check if "Budget" > $10k → 3. Get name & company → 4. Format message → 5. Post to Slack</em></td>
+               </tr>
+               <tr>
+                   <td><strong>4. 🛠️ List Tools</strong></td>
+                   <td>What <strong>software</strong> do you use now?</td>
+                   <td><em>"Website forms, Slack, maybe Google Sheets"</em></td>
+               </tr>
+               <tr>
+                   <td><strong>5. ✅ Define Success</strong></td>
+                   <td>How will you know it <strong>worked?</strong></td>
+                   <td><em>"Sales team gets notified within 5 minutes of high-value leads"</em></td>
+               </tr>
+           </tbody>
+       </table>
+
+
+       <div class="interactive-prompt-box" style="margin-top: 2rem;">
+           <h4><i class="fas fa-lightbulb"></i>Pro tip: Sketch first</h4>
+           <p>Draw your process map on paper/whiteboard, take a picture, and upload it to an LLM (like Gemini or ChatGPT) with a prompt like:</p>
+           <p><em>"Based on this image of a manual workflow, create a detailed, step-by-step plan for building it as a digital automation."</em></p>
+       </div>
+   </div>
+</div>
+
+
+<!-- Slide 4: Step 2 - Understand Your Automation Needs -->
+<div class="slide" id="slide-4">
+   <div class="slide-header">
+       <div>
+           <div style="background-color: white; width: 40px; height: 40px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;">
+               <img style="height: 20px;" src="logo.png" alt="LO Logo">
+           </div>
+           <span style="margin-left: 0.2rem; font-weight: 500;">Zoomo Automation & AI Agents Playbook</span>
+       </div>
+       <div>Step 2: Automation Intelligence</div>
+   </div>
+   <div class="slide-content">
+       <div style="display: flex; align-items: center; margin-bottom: 3rem;">
+           <div style="background: linear-gradient(135deg, #4ECDC4, #44A08D); width: 80px; height: 80px; border-radius: 20px; display: flex; align-items: center; justify-content: center; margin-right: 2rem;">
+               <i class="fas fa-brain" style="font-size: 2rem; color: white;"></i>
+           </div>
+           <div>
+               <h2 style="margin-bottom: 0.5rem; font-size: 2.5rem; color: #4ECDC4;">2. Understand Your Automation Needs</h2>
+               <p style="color: var(--text); font-size: 1.1rem; margin: 0;">What "brain" does your automation require?</p>
+           </div>
+       </div>
+
+
+       <div class="highlight-box">
+           <p>Think of automation as <strong>three levels on a ladder</strong> - from simple rules to intelligent agents.</p>
+       </div>
+
+
+       <h3>📊 The 3 Levels of Automation</h3>
+      
+       <table style="margin-top: 1.5rem;">
+           <thead>
+               <tr>
+                   <th style="width: 10%;">Level</th>
+                   <th style="width: 20%;">Type</th>
+                   <th style="width: 25%;">How it Works</th>
+                   <th style="width: 25%;">Key Characteristic</th>
+                   <th style="width: 20%;">Example</th>
+               </tr>
+           </thead>
+           <tbody>
+               <tr style="background-color: rgba(255, 107, 107, 0.1);">
+                   <td><strong>1</strong></td>
+                   <td><strong>Rule-Based Automation</strong></td>
+                   <td>"IF this → THEN that"</td>
+                   <td>Follows a fixed path. No thinking involved</td>
+                   <td><em>Copying a new lead from a form to a spreadsheet</em></td>
+               </tr>
+               <tr style="background-color: rgba(78, 205, 196, 0.1);">
+                   <td><strong>2</strong></td>
+                   <td><strong>AI-Enhanced Workflow</strong></td>
+                   <td>Traditional automation + AI step: "If This → Think About It (LLM) → Then That"</td>
+                   <td>A standard workflow with a "smart" step where an AI analyzes or generates something</td>
+                   <td><em>Classifying an email as "Urgent" or "Not Urgent" before routing it</em></td>
+               </tr>
+               <tr style="background-color: rgba(106, 13, 173, 0.1);">
+                   <td><strong>3</strong></td>
+                   <td><strong>AI Agent</strong></td>
+                   <td>Set a goal → figures out how to achieve it</td>
+                   <td>Autonomously decides the best steps to achieve a goal. It can use tools and has memory</td>
+                   <td><em>"Handle the next support ticket from start to finish."</em></td>
+               </tr>
+           </tbody>
+       </table>
+
+
+       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 2rem;">
+           <div style="background: rgba(255, 107, 107, 0.05); border-left: 4px solid #FF6B6B; padding: 1.5rem; border-radius: 0.5rem;">
+               <h4 style="color: #FF6B6B; margin-bottom: 1rem; display: flex; align-items: center;">
+                   <i class="fas fa-cog" style="margin-right: 0.5rem;"></i>Level 1: Rule-Based
+               </h4>
+               <p style="margin-bottom: 0.5rem;"><em>"Do exactly this, every single time"</em></p>
+               <p style="font-size: 0.9rem;">✅ Deterministic: Same input = same output</p>
+               <p style="font-size: 0.9rem;">🛠️ Tools: Google Gems, Zapier, basic Make</p>
+           </div>
+          
+           <div style="background: rgba(78, 205, 196, 0.05); border-left: 4px solid #4ECDC4; padding: 1.5rem; border-radius: 0.5rem;">
+               <h4 style="color: #4ECDC4; margin-bottom: 1rem; display: flex; align-items: center;">
+                   <i class="fas fa-brain" style="margin-right: 0.5rem;"></i>Level 2: AI-Enhanced
+               </h4>
+               <p style="margin-bottom: 0.5rem;"><em>"Follow my process, but be smart about this one decision"</em></p>
+               <p style="font-size: 0.9rem;">✅ Smart decision points + flexible input</p>
+               <p style="font-size: 0.9rem;">🛠️ Tools: Zapier + AI, Make + AI, n8n</p>
+           </div>
+          
+           <div style="background: rgba(106, 13, 173, 0.05); border-left: 4px solid var(--primary); padding: 1.5rem; border-radius: 0.5rem;">
+               <h4 style="color: var(--primary); margin-bottom: 1rem; display: flex; align-items: center;">
+                   <i class="fas fa-robot" style="margin-right: 0.5rem;"></i>Level 3: AI Agents
+               </h4>
+               <p style="margin-bottom: 0.5rem;"><em>"Here's my goal – figure out the best way to achieve it"</em></p>
+               <p style="font-size: 0.9rem;">✅ Autonomous + memory + adaptive</p>
+               <p style="font-size: 0.9rem;">🛠️ Tools: n8n agents, custom code</p>
+           </div>
+       </div>
+   </div>
+</div>
+
+
+<!-- Slide 5: Step 3 - Select the Right Tool -->
+<div class="slide" id="slide-5">
+   <div class="slide-header">
+       <div>
+           <div style="background-color: white; width: 40px; height: 40px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;">
+               <img style="height: 20px;" src="logo.png" alt="LO Logo">
+           </div>
+           <span style="margin-left: 0.2rem; font-weight: 500;">Zoomo Automation & AI Agents Playbook</span>
+       </div>
+       <div>Step 3: Tool Selection</div>
+   </div>
+   <div class="slide-content">
+       <div style="display: flex; align-items: center; margin-bottom: 3rem;">
+           <div style="background: linear-gradient(135deg, #45B7D1, #2196F3); width: 80px; height: 80px; border-radius: 20px; display: flex; align-items: center; justify-content: center; margin-right: 2rem;">
+               <i class="fas fa-tools" style="font-size: 2rem; color: white;"></i>
+           </div>
+           <div>
+               <h2 style="margin-bottom: 0.5rem; font-size: 2.5rem; color: #45B7D1;">3. Select the Right Tool</h2>
+               <p style="color: var(--text); font-size: 1.1rem; margin: 0;">How to choose the right tool in 60 seconds</p>
+           </div>
+       </div>
+
+
+       <div class="highlight-box">
+           <h4 style="margin-bottom: 1rem;">Quick Decision Guide:</h4>
+           <ul style="margin: 0;">
+               <li><strong>"Every run should be identical"</strong> ➜ Traditional automation (Zapier)</li>
+               <li><strong>"Needs a chatbot/LLM once or twice"</strong> ➜ AI-enhanced (Zapier, Make)</li>
+               <li><strong>"Else, or full autonomy"</strong> ➜ AI Agent (n8n, custom code)</li>
+           </ul>
+       </div>
+
+
+       <h3>🛠️ Zoomo Toolkit at a Glance</h3>
+      
+       <table style="margin-top: 1.5rem;">
+           <thead>
+               <tr>
+                   <th style="width: 15%;">Tool</th>
+                   <th style="width: 35%;">Use it for</th>
+                   <th style="width: 15%;">Skill Level</th>
+                   <th style="width: 35%;">Key Fact for Zoomo</th>
+               </tr>
+           </thead>
+           <tbody>
+               <tr>
+                   <td><strong>Google Gems</strong></td>
+                   <td>Repetitive chatbot tasks where you use the same prompt over and over <em>(e.g., summarizing meeting transcripts)</em><br><br><strong>Important:</strong> Personal use only</td>
+                   <td><span style="background: #4CAF50; color: white; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.8rem;">Beginner</span></td>
+                   <td>Easiest and fastest way to automate repetitive chatbot tasks</td>
+               </tr>
+               <tr>
+                   <td><strong>Zapier<br><br>Zapier + AI chat</td></strong>
+                   <td>➜ Traditional, rule-based automations<br><br>➜ AI step for basic AI-enhancement</td>
+                   <td><span style="background: #4CAF50; color: white; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.8rem;">Beginner</span></td>
+                   <td>Easiest to use and has the most app connections (7,000+). Use for MVPs, then move to advanced tools.</td>
+               </tr>
+               <tr>
+                   <td><strong>Make</strong></td>
+                   <td>Complex workflows with multiple steps, branching logic, or processing lists of data (arrays)</td>
+                   <td><span style="background: #FF9800; color: white; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.8rem;">Intermediate</span></td>
+                   <td>More powerful and cost-effective than Zapier for complex scenarios, but more technical too.</td>
+               </tr>
+               <tr>
+                   <td><strong>n8n</strong></td>
+                   <td>Advanced AI Agents + custom integrations</td>
+                   <td><span style="background: #F44336; color: white; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.8rem;">Advanced</span></td>
+                   <td>Powerful tool for autonomous agents</td>
+               </tr>
+               <tr>
+                   <td><strong>Custom Code</strong></td>
+                   <td>High-volume, mission-critical systems where performance, cost-at-scale, and full control are essential</td>
+                   <td><span style="background: #9C27B0; color: white; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.8rem;">Expert</span></td>
+                   <td>Ultimate control and scalability, but requires the most engineering effort</td>
+               </tr>
+           </tbody>
+       </table>
+   </div>
+</div>
+
+
+<!-- Slide 6: Golden Rules & Next Steps -->
+<div class="slide" id="slide-6">
+   <div class="slide-header">
+       <div>
+           <div style="background-color: white; width: 40px; height: 40px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;">
+               <img style="height: 20px;" src="logo.png" alt="LO Logo">
+           </div>
+           <span style="margin-left: 0.2rem; font-weight: 500;">Zoomo Automation & AI Agents Playbook</span>
+       </div>
+       <div>Golden Rules & Next Steps</div>
+   </div>
+   <div class="slide-content">
+       <div style="display: flex; align-items: center; margin-bottom: 3rem;">
+           <div style="background: linear-gradient(135deg, #FECA57, #FF9F43); width: 80px; height: 80px; border-radius: 20px; display: flex; align-items: center; justify-content: center; margin-right: 2rem;">
+               <i class="fas fa-crown" style="font-size: 2rem; color: white;"></i>
+           </div>
+           <div>
+               <h2 style="margin-bottom: 0.5rem; font-size: 2.5rem; color: #FECA57;">4. The Golden Rules</h2>
+               <p style="color: var(--text); font-size: 1.1rem; margin: 0;">Essential guidelines for success</p>
+           </div>
+       </div>
+
+
+       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 2rem;">
+           <div style="background: rgba(244, 67, 54, 0.05); border-left: 4px solid #F44336; padding: 2rem; border-radius: 0.5rem;">
+               <h3 style="color: #F44336; margin-bottom: 1rem; display: flex; align-items: center;">
+                   <i class="fas fa-shield-alt" style="margin-right: 0.75rem;"></i>#1: Be careful with company data
+               </h3>
+               <ul style="margin: 0; color: var(--text);">
+                   <li>We use cloud-based AI models (OpenAI GPT, Google Gemini)</li>
+                   <li><strong>Any data you send leaves the Zoomo environment</strong></li>
+                   <li><strong>Do NOT send PII</strong> or sensitive company data without approval</li>
+                   <li>If your project involves sensitive data, <strong>consult IT team first</strong></li>
+               </ul>
+           </div>
+
+
+           <div style="background: rgba(76, 175, 80, 0.05); border-left: 4px solid #4CAF50; padding: 2rem; border-radius: 0.5rem;">
+               <h3 style="color: #4CAF50; margin-bottom: 1rem; display: flex; align-items: center;">
+                   <i class="fas fa-rocket" style="margin-right: 0.75rem;"></i>#2: Start simple, then scale
+               </h3>
+               <ul style="margin: 0; color: var(--text);">
+                   <li>Don't over-engineer</li>
+                   <li>Build a simple MVP in the most accessible tool first (Zapier/Make)</li>
+                   <li>Once you've proven it adds value, consider rebuilding in advanced tools</li>
+                   <li>Focus on cost-efficiency and scalability later</li>
+               </ul>
+           </div>
+       </div>
+    
+
+       <div style="display: flex; align-items: center; margin: 3rem 0 2rem 0;">
+           <div style="background: linear-gradient(135deg, #96CEB4, #85D1C4); width: 60px; height: 60px; border-radius: 15px; display: flex; align-items: center; justify-content: center; margin-right: 1.5rem;">
+               <i class="fas fa-clipboard-check" style="font-size: 1.5rem; color: white;"></i>
+           </div>
+           <div>
+               <h2 style="margin-bottom: 0.5rem; font-size: 2rem; color: #96CEB4;">5. What To Do Next</h2>
+           </div>
+       </div>
+
+
+       <div class="activity-container">
+           <div class="activity-card">
+               <h3><i class="fas fa-lightbulb"></i>Got an idea?</h3>
+               <p>Follow the planning process in this guide - start with mapping your process step by step.</p>
+           </div>
+          
+           <div class="activity-card">
+               <h3><i class="fas fa-question-circle"></i>Unsure?</h3>
+               <p>Ask the IT team directly or post in <strong>#ai-hub</strong> Slack channel for help and guidance.</p>
+           </div>
+          
+           <div class="activity-card">
+               <h3><i class="fas fa-seedling"></i>Start small</h3>
+               <p>Build a simple automation first and improve it over time. MVP approach wins!</p>
+           </div>
+       </div>
+
+
+       <div class="quote" style="margin-top: 2rem;">
+           <p><strong>Remember:</strong> The goal is to work smarter, not harder. Every automation should save time, reduce errors, or improve quality of work.</p>
+       </div>
+   </div>
+</div>
+
+
+<!-- Slide 7: AI Glossary -->
+<div class="slide" id="slide-7">
+   <div class="slide-header">
+       <div>
+           <div style="background-color: white; width: 40px; height: 40px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;">
+               <img style="height: 20px;" src="logo.png" alt="LO Logo">
+           </div>
+           <span style="margin-left: 0.2rem; font-weight: 500;">Zoomo Automation & AI Agents Playbook</span>
+       </div>
+       <div>AI Glossary</div>
+   </div>
+   <div class="slide-content">
+       <div style="display: flex; align-items: center; margin-bottom: 3rem;">
+           <div style="background: linear-gradient(135deg, var(--primary), var(--accent)); width: 80px; height: 80px; border-radius: 20px; display: flex; align-items: center; justify-content: center; margin-right: 2rem;">
+               <i class="fas fa-book" style="font-size: 2rem; color: white;"></i>
+           </div>
+           <div>
+               <h2 style="margin-bottom: 0.5rem; font-size: 2.5rem;">AI Glossary</h2>
+               <p style="color: var(--text); font-size: 1.1rem; margin: 0;">Key terms explained in plain English</p>
+           </div>
+       </div>
+
+
+       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 1.5rem;">
+           <div style="background: white; border-radius: 15px; padding: 2rem; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-left: 5px solid var(--primary);">
+               <h3 style="color: var(--primary); margin-bottom: 1rem; display: flex; align-items: center;">
+                   <i class="fas fa-robot" style="margin-right: 0.75rem;"></i>AI Agent
+               </h3>
+               <p style="margin: 0; line-height: 1.6;">A smart bot you give a <strong>goal</strong> to. It then figures out the steps and uses other apps ("tools") to achieve that goal on its own.</p>
+           </div>
+
+
+           <div style="background: white; border-radius: 15px; padding: 2rem; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-left: 5px solid #4ECDC4;">
+               <h3 style="color: #4ECDC4; margin-bottom: 1rem; display: flex; align-items: center;">
+                   <i class="fas fa-brain" style="margin-right: 0.75rem;"></i>LLM (Large Language Model)
+               </h3>
+               <p style="margin: 0; line-height: 1.6;">The "brain" behind AI, like Google's Gemini. It's trained on the internet to understand and write human-like text.</p>
+           </div>
+
+
+           <div style="background: white; border-radius: 15px; padding: 2rem; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-left: 5px solid #FF6B6B;">
+               <h3 style="color: #FF6B6B; margin-bottom: 1rem; display: flex; align-items: center;">
+                   <i class="fas fa-tools" style="margin-right: 0.75rem;"></i>Tool Calling
+               </h3>
+               <p style="margin: 0; line-height: 1.6;">An AI Agent's ability to use other software. For example, using Google Search to find information or using HubSpot to look up a customer.</p>
+           </div>
+
+
+           <div style="background: white; border-radius: 15px; padding: 2rem; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-left: 5px solid #45B7D1;">
+               <h3 style="color: #45B7D1; margin-bottom: 1rem; display: flex; align-items: center;">
+                   <i class="fas fa-search" style="margin-right: 0.75rem;"></i>RAG (Retrieval-Augmented Generation)
+               </h3>
+               <p style="margin: 0; line-height: 1.6;">The best way to make an AI smart about Zoomo. We give the AI a library of our own internal documents to read <em>before</em> it answers. Much cheaper than fine-tuning.</p>
+           </div>
+           
+            <div style="background: white; border-radius: 15px; padding: 2rem; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-left: 5px solid #FECA57;">
+               <h3 style="color: #FECA57; margin-bottom: 1rem; display: flex; align-items: center;">
+                   <i class="fas fa-code" style="margin-right: 0.75rem;"></i>API (Application Programming Interface)
+               </h3>
+               <p style="margin: 0; line-height: 1.6;">a set of rules and specifications that allows different software systems to communicate and interact with each other.</p>
+           </div>
+
+           <div style="background: white; border-radius: 15px; padding: 2rem; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-left: 5px solid #96CEB4;">
+               <h3 style="color: #96CEB4; margin-bottom: 1rem; display: flex; align-items: center;">
+                   <i class="fas fa-paper-plane" style="margin-right: 0.75rem;"></i>Webhook
+               </h3>
+               <p style="margin: 0; line-height: 1.6;">A way for an app to send real-time information to another app as soon as an event happens. It's essentially an HTTP callback that triggers an action in another system when a defined event happens in the source system.</p>
+           </div>
+
+       </div>
+   </div> <!-- end of .slide for slide-7 -->
+
+   <script>
+       const slides = document.querySelectorAll('.slide');
+       const progressBar = document.getElementById('progressBar');
+       const slideCounter = document.getElementById('slideCounter');
+       const nextBtns = document.querySelectorAll('.nextBtn');
+       const prevBtns = document.querySelectorAll('.prevBtn');
+       nextBtns.forEach(btn => btn.addEventListener('click', nextSlide));
+       prevBtns.forEach(btn => btn.addEventListener('click', prevSlide));
+       let currentSlide = 0;
+
+       function showSlide(n) {
+           slides.forEach(slide => slide.classList.remove('active'));
+           slides[n].classList.add('active');
+           currentSlide = n;
+           updateProgressBar();
+           updateSlideCounter();
+           // Scroll to top of new slide
+           if (slides[n]) { // Ensure slide exists
+               slides[n].scrollTop = 0;
+           }
+       }
+
+       function nextSlide() {
+           if (currentSlide < slides.length - 1) {
+               showSlide(currentSlide + 1);
+           }
+       }
+
+       function prevSlide() {
+           if (currentSlide > 0) {
+               showSlide(currentSlide - 1);
+           }
+       }
+
+       function updateProgressBar() {
+           if (slides.length > 0) {
+               const progress = ((currentSlide + 1) / slides.length) * 100;
+               progressBar.style.width = progress + '%';
+           }
+       }
+
+       function updateSlideCounter() {
+           if (slides.length > 0) {
+               slideCounter.textContent = `Slide ${currentSlide + 1} of ${slides.length}`;
+           }
+       }
+
+       document.addEventListener('keydown', (event) => {
+           if (event.key === 'ArrowRight' || event.key === ' ') {
+               nextSlide();
+           } else if (event.key === 'ArrowLeft') {
+               prevSlide();
+           }
+       });
+
+       // Initialize
+       if (slides.length > 0) {
+           showSlide(0);
+       }
+   </script>
+</body>
+</html>
